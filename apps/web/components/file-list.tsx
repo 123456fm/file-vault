@@ -1,16 +1,16 @@
 "use client";
 import { Button } from "@file-vault/ui";
-import type { FileRecord } from "@file-vault/supabase";
+import { getSupabaseClient, type FileRecord } from "@file-vault/supabase";
+
+const BUCKET = "files";
 
 type Props = { files: FileRecord[]; onDeleted: () => void };
 
 export function FileList({ files, onDeleted }: Props) {
   async function handleDelete(file: FileRecord) {
-    await fetch("/api/files", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: file.id, storage_path: file.storage_path }),
-    });
+    const supabase = getSupabaseClient();
+    await supabase.storage.from(BUCKET).remove([file.storage_path]);
+    await supabase.from("files").delete().eq("id", file.id);
     onDeleted();
   }
 

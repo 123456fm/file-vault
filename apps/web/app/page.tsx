@@ -2,15 +2,18 @@
 import { useEffect, useState } from "react";
 import { UploadButton } from "@/components/upload-button";
 import { FileList } from "@/components/file-list";
-import type { FileRecord } from "@file-vault/supabase";
+import { getSupabaseClient, type FileRecord } from "@file-vault/supabase";
 
 export default function HomePage() {
   const [files, setFiles] = useState<FileRecord[]>([]);
 
   async function loadFiles() {
-    const res = await fetch("/api/files");
-    const data = await res.json();
-    setFiles(data);
+    const supabase = getSupabaseClient();
+    const { data } = await supabase
+      .from("files")
+      .select("*")
+      .order("created_at", { ascending: false });
+    setFiles(data ?? []);
   }
 
   useEffect(() => { loadFiles(); }, []);
