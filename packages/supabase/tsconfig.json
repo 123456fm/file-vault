@@ -1,0 +1,4 @@
+{
+  "extends": "@file-vault/config/tsconfig",
+  "include": ["src"]
+}
