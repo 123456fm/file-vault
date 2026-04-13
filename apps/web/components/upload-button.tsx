@@ -38,7 +38,10 @@ export function UploadButton({ files, onUploaded, onToast }: Props) {
 
     setLoading(true);
     const supabase = getSupabaseClient();
-    const storagePath = `${Date.now()}-${file.name}`;
+    // 用时间戳+随机ID作为存储路径，避免中文/特殊字符导致 Invalid key 错误
+    const ext = file.name.includes(".") ? file.name.split(".").pop() : "";
+    const safeId = Math.random().toString(36).slice(2, 8);
+    const storagePath = ext ? `${Date.now()}-${safeId}.${ext}` : `${Date.now()}-${safeId}`;
 
     const { error: uploadError } = await supabase.storage
       .from(BUCKET)
